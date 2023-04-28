@@ -35,12 +35,21 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define LED_TURN_OFF	1
+#define LED_TURN_ON		0
+
+#define LED_GPIO_PORT	GPIOC
+#define LED_PIN			GPIO_PIN_13
+
+#define EXTI_GPIO_PORT	GPIOB
+#define EXTI_PIN		GPIO_PIN_9
+
+#define STOP_MODE_SET
 
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -89,23 +98,30 @@ void vApplicationIdleHook( void )
 /* USER CODE BEGIN PREPOSTSLEEP */
 __weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
+	HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, LED_TURN_OFF);
+#ifdef STOP_MODE_SET
+//	HAL_DBGMCU_EnableDBGStopMode();
+	HAL_DBGMCU_DisableDBGStopMode();
 
-	HAL_DBGMCU_EnableDBGStopMode();
-//	HAL_DBGMCU_DisableDBGStopMode();
-	/* This is needed to prevent TIM6 from triggering an interrupt,
-	* which could prevent the CPU from entering STOP mode */
+	HAL_SuspendTick();
+	// Enter STOP mode
+	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+#else
+//	HAL_DBGMCU_EnableDBGSleepMode();
+	HAL_DBGMCU_DisableDBGSleepMode();
+
 	HAL_SuspendTick();
 
-	/* Enter STOP mode */
-	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+	HAL_PWR_EnterSLEEPMode(0, PWR_STOPENTRY_WFI);
+#endif
 }
 
 __weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
 {
+#ifdef STOP_MODE_SET
 	/* Restore Clock settings */
 	SystemClock_Config();
-
+#endif
 	/* Resume HAL timebase */
 	HAL_ResumeTick();
 }
@@ -167,7 +183,7 @@ void StartDefaultTask(void *argument)
   {
 	  if (osSemaphoreAcquire(BinarySemaphoreHandle, osWaitForever) == osOK)
 	  {
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 0);
+		  HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, LED_TURN_ON);
 		  for(int i = 0; i < 3200000; i++) {
 			  __asm__("NOP");
 		  }
