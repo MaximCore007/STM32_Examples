@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceFolder}",
+            "executable": "./build/f103_test.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "svdFile": "STM32F103.svd",
+            "runToEntryPoint": "main",
+            "servertype": "openocd",
+            "showDevDebugOutput" : "raw",
+            "device": "STM32F103",
+            "configFiles": [
+                "interface/stlink-v2.cfg",
+                "target/stm32f1x.cfg"
+            ]
+        }
+    ]
+}
