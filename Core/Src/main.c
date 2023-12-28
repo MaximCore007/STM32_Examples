@@ -20,13 +20,13 @@ static void GPIO_Init(void)
 {
   /* Initialize LED which connected to PC13, Enable the Clock*/
   LL_GPIO_InitTypeDef  GPIO_InitStructure;
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
   /* Configure the GPIO_LED pin */
   GPIO_InitStructure.Pin = LL_GPIO_PIN_13;
   GPIO_InitStructure.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStructure.Speed = LL_GPIO_MODE_OUTPUT_2MHz;
   GPIO_InitStructure.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStructure);
+  LL_GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 
 /**
@@ -46,7 +46,7 @@ int main(void)
   while (1)
   {
     /* Toggle LED which connected to PC13*/
-    LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_13);
+    LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_13);
 
     /* delay */
     for(uint32_t i = 0; i < 1000000; i++);
